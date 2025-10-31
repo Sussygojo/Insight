@@ -4,7 +4,7 @@ const nextConfig = {
   experimental: {
     turbo: true,
   },
-  webpack: (config: any) => {
+  webpack: (config) => {
     config.infrastructureLogging = { level: "error" };
     return config;
   },
