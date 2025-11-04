@@ -1,3 +1,10 @@
+To run this application -
+-- Install all the dependencies with : npm i
+-- This project gets stock data from marketStack api, so create an .env file and add your api key
+-- For AI insights, this app uses ollama. Install ollama and configure it with your installed mode in route.tsx.
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
