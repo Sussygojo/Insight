@@ -1,5 +1,7 @@
-import Sidebar from "@/app/dashboard/components/Sidebar";
+import SidebarWindow from "@/app/dashboard/components/SidebarWindow";
 import Topbar from "../components/Topbar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
 export default function DashboardLayout({
   children,
 }: {
@@ -7,10 +9,11 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex ">
-      <Sidebar />
-      <main className=" w-full min-h-screen bg-[#0d0f13] text-white p-6">
-        {children}
-      </main>
+      <SidebarProvider>
+        <SidebarWindow />
+        <SidebarTrigger />
+        <main className=" w-full min-h-screen t p-6">{children}</main>
+      </SidebarProvider>
     </div>
   );
 }

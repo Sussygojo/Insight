@@ -1,5 +1,11 @@
 "use client";
+
 import React, { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
+
 export interface StockData {
   open: number;
   high: number;
@@ -9,6 +15,7 @@ export interface StockData {
   week52High: number;
   week52Low: number;
 }
+
 export default function StockDetail({
   symbol,
   name,
@@ -21,10 +28,12 @@ export default function StockDetail({
   const [loading, setLoading] = useState(false);
   const [insight, setInsight] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
   const generateInsight = async () => {
     setLoading(true);
     setError(null);
     setInsight(null);
+
     try {
       const res = await fetch("/api/insight", {
         method: "POST",
@@ -34,79 +43,127 @@ export default function StockDetail({
           stockData: data,
         }),
       });
+
       const result = await res.json();
-      console.log("Insight result :", result);
+
       if (!res.ok) {
         throw new Error(result.error || "Failed to generate insight");
       }
-      setInsight(result.insight || "No insight recieved.");
+
+      setInsight(result.insight || "No insight received.");
     } catch (err) {
-      console.error("Error :", err);
       setError("Failed to generate insight. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
   if (!data) {
     return (
-      <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
-        <h2 className="text-lg text-gray-300 mb-3">
-          {symbol ? `${symbol} Details` : "Stock Details"}
-        </h2>
-        <p className="text-gray-400">No data available.</p>
-      </div>
+      <Card className="mt-6 border border-gray-200 dark:border-gray-800">
+        <CardHeader>
+          <CardTitle className="text-gray-800 dark:text-gray-200">
+            {symbol ? `${symbol} Details` : "Stock Details"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600 dark:text-gray-400">No data available.</p>
+        </CardContent>
+      </Card>
     );
   }
+
   return (
-    <div className="bg-gray-900 p-6 rounded-2xl shadow-md mt-8">
-      <h2 className="text-xl font-semibold mb-4 text-white">
-        {symbol.toUpperCase()} — {name}
-      </h2>
+    <Card className="mt-8 shadow-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0f1115]">
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          {symbol.toUpperCase()} — {name}
+        </CardTitle>
+      </CardHeader>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-gray-300">
-        <div>
-          <strong>Open:</strong> {data.open}
-        </div>
-        <div>
-          <strong>High:</strong> {data.high}
-        </div>
-        <div>
-          <strong>Low:</strong> {data.low}
-        </div>
-        <div>
-          <strong>Prev Close:</strong> {data.prevClose}
-        </div>
-        <div>
-          <strong>Volume:</strong> {data.volume}
-        </div>
-        <div>
-          <strong>52W High:</strong> {data.week52High}
-        </div>
-        <div>
-          <strong>52W Low:</strong> {data.week52Low}
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-col items-center">
-        <button
-          onClick={generateInsight}
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 px-5 py-2 rounded-lg text-white font-medium transition"
-        >
-          {loading ? "Generating Insight..." : "🧠 Generate AI Insight"}
-        </button>
-
-        {error && <p className="text-red-400 mt-4 text-sm">{error}</p>}
-
-        {insight && (
-          <div className="bg-gray-800 text-gray-200 mt-6 p-4 rounded-lg w-full max-w-3xl">
-            <h3 className="text-lg font-semibold mb-2 text-blue-400">
-              AI Insight
-            </h3>
-            <p className="leading-relaxed text-sm">{insight}</p>
+      <CardContent>
+        {/* Stock Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-gray-800 dark:text-gray-300">
+          <div>
+            <strong className="text-gray-900 dark:text-gray-100">Open:</strong>{" "}
+            {data.open}
           </div>
-        )}
-      </div>
-    </div>
+          <div>
+            <strong className="text-gray-900 dark:text-gray-100">High:</strong>{" "}
+            {data.high}
+          </div>
+          <div>
+            <strong className="text-gray-900 dark:text-gray-100">Low:</strong>{" "}
+            {data.low}
+          </div>
+          <div>
+            <strong className="text-gray-900 dark:text-gray-100">
+              Prev Close:
+            </strong>{" "}
+            {data.prevClose}
+          </div>
+          <div>
+            <strong className="text-gray-900 dark:text-gray-100">
+              Volume:
+            </strong>{" "}
+            {data.volume}
+          </div>
+          <div>
+            <strong className="text-gray-900 dark:text-gray-100">
+              52W High:
+            </strong>{" "}
+            {data.week52High}
+          </div>
+          <div>
+            <strong className="text-gray-900 dark:text-gray-100">
+              52W Low:
+            </strong>{" "}
+            {data.week52Low}
+          </div>
+        </div>
+
+        {/* Action + Results */}
+        <div className="mt-6 flex flex-col items-center">
+          <Button
+            onClick={generateInsight}
+            disabled={loading}
+            className="w-full md:w-auto"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating Insight...
+              </>
+            ) : (
+              "🧠 Generate AI Insight"
+            )}
+          </Button>
+
+          {/* Error */}
+          {error && (
+            <Alert
+              variant="destructive"
+              className="mt-4 max-w-lg bg-red-500/10 border-red-500/50"
+            >
+              <AlertDescription className="text-red-400">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Insight Box */}
+          {insight && (
+            <div className="mt-6 w-full max-w-3xl bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-2 text-blue-600 dark:text-blue-400">
+                AI Insight
+              </h3>
+              <p className="leading-relaxed text-gray-800 dark:text-gray-300 text-sm">
+                {insight}
+              </p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
